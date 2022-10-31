@@ -248,6 +248,7 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
                     instance.setClusterName(UtilsAndCommons.DEFAULT_CLUSTER_NAME);
                 }
                 
+                // 如果clusterMap中不包含这个cluster名字那么就创建一个，并放到clusterMap中
                 if (!clusterMap.containsKey(instance.getClusterName())) {
                     Loggers.SRV_LOG
                             .warn("cluster: {} not found, ip: {}, will create new cluster with default configuration.",
@@ -256,7 +257,7 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
                     cluster.init();
                     getClusterMap().put(instance.getClusterName(), cluster);
                 }
-                
+                // 将对应的集群name的instance放到对应的ipMap中，ps：同一个集群ip相同，所以叫ipMap？
                 List<Instance> clusterIPs = ipMap.get(instance.getClusterName());
                 if (clusterIPs == null) {
                     clusterIPs = new LinkedList<>();
@@ -272,6 +273,7 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
         for (Map.Entry<String, List<Instance>> entry : ipMap.entrySet()) {
             //make every ip mine
             List<Instance> entryIPs = entry.getValue();
+            // 将instance更新至clusterMap中
             clusterMap.get(entry.getKey()).updateIps(entryIPs, ephemeral);
         }
         
